@@ -48,6 +48,8 @@
 #include "network_interface.h"
 #include "exceptions.h"
 #include "pdu_allocator.h"
+//AJOUT
+#include "icmp.h"
 
 using std::list;
 
@@ -461,6 +463,44 @@ bool IP::matches_response(const uint8_t *ptr, uint32_t total_sz) const {
     }
     return false;
 }
+
+//AJOUT
+bool IP::matches_response_generic(const PDU& rpdu) const
+{
+	try {
+		const IP& rip = rpdu.rfind_pdu<IP>();
+
+		//compare size
+		if (rip.size() < this->header_size())
+			return false;
+
+		//dest unreachable?
+		if (rip.protocol() == Constants::IP::PROTO_ICMP)
+		{
+			std::cout << unsigned(rip.protocol()) << std::endl;
+			const Tins::ICMP& icmp_resp = rip.rfind_pdu<Tins::ICMP>();
+			const RawPDU& icmp_payload = icmp_resp.rfind_pdu<RawPDU>();
+			//TO DO : implements try catch au cas ou pas de IP contenu dans le ICMP(ex ICMP request)
+			const IP& ip_orig = icmp_payload.to<IP>();
+			if (this->rfind_pdu<IP>().id() == ip_orig.id())
+			{
+				std::cout << " ICMP MATCH: identifier " << ip_orig.id() << std::endl;
+				return true;
+			}
+		}
+
+		//broadcast addr
+		if (this->src_addr() == rip.dst_addr() && (this->dst_addr() == rip.src_addr() || this->dst_addr().is_broadcast()))
+			//|| (this->dst_addr().is_broadcast() && this->src_addr() == 0)
+			return (inner_pdu() ? inner_pdu()->matches_response_generic(rpdu) : true);
+
+		return false;
+	}
+	catch (const pdu_not_found&) {
+		return false;
+	}
+}
+
 
 // Option static constructors from options
 

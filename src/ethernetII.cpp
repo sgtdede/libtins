@@ -162,7 +162,6 @@ bool EthernetII::matches_response_generic(const PDU& rpdu) const
 
 		//spdu @mac src == rpdu @mac dst
 		if (src_addr() == reth.dst_addr() || src_addr() == BROADCAST)
-			//TO DO: return match_reponse inner pdu !!
 			return (inner_pdu() ? inner_pdu()->matches_response_generic(rpdu) : true);
 
 		return false;

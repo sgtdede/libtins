@@ -233,4 +233,30 @@ bool ICMP::matches_response(const uint8_t *ptr, uint32_t total_sz) const {
     }
     return false;
 }
+
+//AJOUT
+bool ICMP::matches_response_generic(const PDU& rpdu) const
+{
+	try {
+		const ICMP& ricmp = rpdu.rfind_pdu<ICMP>();
+
+		//compare size
+		if (ricmp.size() < this->header_size())
+			return false;
+
+		if ((this->type() == ICMP4_ECHO_REQUEST && ricmp.type() == ICMP4_ECHO_REPLY) ||
+			(this->type() == ICMP4_TIMESTAMP_REQUEST && ricmp.type() == ICMP4_TIMESTAMP_REPLY) ||
+			(this->type() == ICMP4_MASK_REQUEST && ricmp.type() == ICMP4_MASK_REPLY))
+		{
+
+			return (this->sequence() == ricmp.sequence() && this->id() == ricmp.id());
+		}
+
+		return false;
+	}
+	catch (const pdu_not_found&) {
+		return false;
+	}
+}
+
 } // namespace Tins
