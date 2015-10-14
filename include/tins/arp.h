@@ -283,7 +283,16 @@ namespace Tins {
          * \param total_sz The size of the buffer.
          */
         bool matches_response(const uint8_t *ptr, uint32_t total_sz) const;
-        
+       
+		//AJOUT
+		/**
+		* \brief Check wether rpdu point to a valid response for this pdu. (high level, windows compatible)
+		*
+		* \sa PDU::matches_response_generic
+		* \param rpdu, the reference of the packet.
+		*/
+		bool matches_response_generic(const PDU& rpdu) const;
+
         /**
          * \sa PDU::clone
          */

@@ -151,6 +151,27 @@ bool EthernetII::matches_response(const uint8_t *ptr, uint32_t total_sz) const {
     return false;
 }
 
+//AJOUT
+bool EthernetII::matches_response_generic(const PDU& rpdu) const
+{
+	try {
+		const EthernetII& reth = rpdu.rfind_pdu<EthernetII>();
+		//compare size
+		if (reth.size() < header_size())
+			return false;
+
+		//spdu @mac src == rpdu @mac dst
+		if (src_addr() == reth.dst_addr() || src_addr() == BROADCAST)
+			//TO DO: return match_reponse inner pdu !!
+			return (inner_pdu() ? inner_pdu()->matches_response_generic(rpdu) : true);
+
+		return false;
+	}
+	catch (const pdu_not_found&) {
+		return false;
+	}
+}
+
 void EthernetII::write_serialization(uint8_t *buffer, uint32_t total_sz, const PDU *parent) {
     #ifdef TINS_DEBUG
     assert(total_sz >= header_size() + trailer_size());

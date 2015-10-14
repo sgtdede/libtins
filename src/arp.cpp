@@ -122,6 +122,27 @@ bool ARP::matches_response(const uint8_t *ptr, uint32_t total_sz) const {
     return arp_ptr->ar_sip == _arp.ar_tip && arp_ptr->ar_tip == _arp.ar_sip;
 }
 
+//AJOUT
+bool ARP::matches_response_generic(const PDU& rpdu) const 
+{
+	try {
+		const ARP& rarp = rpdu.rfind_pdu<ARP>();
+
+		//compare size
+		if (rarp.size() < this->header_size())
+			return false;
+
+		//rpdu.ar_sip == spdu.ar_tip && rpdu.ar_tip == spdu.ar_sip
+		if (rarp.target_ip_addr() == this->sender_ip_addr() && rarp.sender_ip_addr() == this->target_ip_addr())
+			return true;
+
+		return false;
+	}
+	catch (const pdu_not_found&) {
+		return false;
+	}
+}
+
 EthernetII ARP::make_arp_request(ipaddress_type target, ipaddress_type sender, 
 const hwaddress_type &hw_snd) 
 {

@@ -398,6 +398,20 @@ namespace Tins {
             return false; 
         }
 
+		//AJOUT
+		/**
+		* \brief Check wether rpdu points to a valid response for this PDU.
+		*
+		* This method must check wether the packet referenced by rpdu is a valid
+		* response for this PDU. If it is valid, then it might want to propagate
+		* the call to the next PDU. Note that in some cases, such as ICMP
+		* Host Unreachable, there is no need to ask the next layer for matching.
+		* \param rpdu The reference to the packet.
+		*/
+		virtual bool matches_response_generic(const PDU& rpdu) const {
+			return false;
+		}
+
         /**
          * \brief Check wether this PDU matches the specified flag.
          *
