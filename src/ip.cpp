@@ -477,15 +477,18 @@ bool IP::matches_response_generic(const PDU& rpdu) const
 		//dest unreachable?
 		if (rip.protocol() == Constants::IP::PROTO_ICMP)
 		{
-			std::cout << unsigned(rip.protocol()) << std::endl;
 			const Tins::ICMP& icmp_resp = rip.rfind_pdu<Tins::ICMP>();
-			const RawPDU& icmp_payload = icmp_resp.rfind_pdu<RawPDU>();
-			//TO DO : implements try catch au cas ou pas de IP contenu dans le ICMP(ex ICMP request)
-			const IP& ip_orig = icmp_payload.to<IP>();
-			if (this->rfind_pdu<IP>().id() == ip_orig.id())
-			{
-				std::cout << " ICMP MATCH: identifier " << ip_orig.id() << std::endl;
-				return true;
+			//try catch au cas ou pas de IP contenu dans le ICMP(ex ICMP request)
+			try {
+				const RawPDU& icmp_payload = icmp_resp.rfind_pdu<RawPDU>();
+				const IP& ip_orig = icmp_payload.to<IP>();
+				if (this->rfind_pdu<IP>().id() == ip_orig.id())
+				{
+					std::cout << " ICMP MATCH: identifier " << ip_orig.id() << std::endl;
+					return true;
+				}
+			}
+			catch (const pdu_not_found&){
 			}
 		}
 
