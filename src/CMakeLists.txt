@@ -39,6 +39,7 @@ ADD_LIBRARY(
     network_interface.cpp
     offline_packet_filter.cpp
     packet_sender.cpp
+    packet_sender_generic.cpp
     packet_writer.cpp
     ppi.cpp
     pdu.cpp

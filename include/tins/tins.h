@@ -46,6 +46,7 @@
 #include "ip.h"
 #include "ipv6.h"
 #include "packet_sender.h"
+#include "packet_sender_generic.h"
 #include "packet_writer.h"
 #include "pdu.h"
 #include "radiotap.h"
