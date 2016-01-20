@@ -159,9 +159,7 @@ void IP::init_ip_fields() {
 }
 
 bool IP::is_fragmented() const {
-    // It's 0 if offset == 0 && more_frag == 0
-    // It's 0x4000 if dont_fragment = 1
-    return frag_off() != 0 && frag_off() != 0x4000;
+    return flags() == IP::MORE_FRAGMENTS || fragment_offset() != 0;
 }
 
 /* Setters */
@@ -180,6 +178,16 @@ void IP::id(uint16_t new_id) {
 
 void IP::frag_off(uint16_t new_frag_off) {
     _ip.frag_off = Endian::host_to_be(new_frag_off);
+}
+
+void IP::fragment_offset(small_uint<13> new_frag_off) {
+    uint16_t value = (Endian::be_to_host(_ip.frag_off) & 0xe000) | new_frag_off;
+    _ip.frag_off = Endian::host_to_be(value);
+}
+
+void IP::flags(Flags new_flags) {
+    uint16_t value = (Endian::be_to_host(_ip.frag_off) & 0x1fff) | (new_flags << 13);
+    _ip.frag_off = Endian::host_to_be(value);
 }
 
 void IP::ttl(uint8_t new_ttl) {
@@ -428,13 +436,11 @@ void IP::write_serialization(uint8_t *buffer, uint32_t total_sz, const PDU* pare
     }
     memset(buffer + sizeof(_ip) + _options_size, 0, _padded_options_size - _options_size);
 
-    if(parent) {
-        uint32_t check = Utils::do_checksum(buffer, buffer + sizeof(_ip) + _padded_options_size);
-        while (check >> 16)
-            check = (check & 0xffff) + (check >> 16);
-        checksum(~check);
-        ((iphdr*)buffer)->check = _ip.check;
-    }
+    uint32_t check = Utils::do_checksum(buffer, buffer + sizeof(_ip) + _padded_options_size);
+    while (check >> 16)
+        check = (check & 0xffff) + (check >> 16);
+    checksum(~check);
+    ((iphdr*)buffer)->check = _ip.check;
 }
 
 bool IP::matches_response(const uint8_t *ptr, uint32_t total_sz) const {

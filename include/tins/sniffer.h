@@ -213,6 +213,14 @@ namespace Tins {
         void set_timeout(int ms);
 
         /**
+         * \brief Sets direction for the sniffer.
+         *
+         * This calls pcap_setdirection using the provided parameter.
+         * \param d The direction for the sniffer.
+         */
+        bool set_direction(pcap_direction_t d);
+
+        /**
          * \brief Sets whether to extract RawPDUs or fully parsed packets.
          *
          * By default, packets will be parsed starting from link layer.
@@ -568,6 +576,12 @@ namespace Tins {
         void set_timeout(unsigned timeout);
 
         /**
+         * Sets the direction option.
+         * \param direction The direction to be set.
+         */
+        void set_direction(pcap_direction_t direction);
+
+        /**
          * Sets the immediate mode option.
          * \param enabled The immediate mode option value.
          */
@@ -597,6 +611,7 @@ namespace Tins {
         bool _promisc;
         bool _rfmon;
         bool _immediate_mode;
+        pcap_direction_t _direction;
     };
 
     template<class Functor>

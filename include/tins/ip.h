@@ -48,6 +48,13 @@ namespace Tins {
      * By default, IP PDUs are initialized, setting TTL to IP::DEFAULT_TTL,
      * id field to 1 and version to 4. Taking this into account, users
      * should set destination and source port and would be enough to send one.
+     *
+     * When IP is the lowest layer on a packet, and the packet is serialized
+     * this willc heck if the source address is different than 0.0.0.0. If it is,
+     * the address of the interface in which the packet is going to be sent
+     * is retrieved (by using the routing table and the destination address)
+     * and set as the source address. If you don't want this behaviour, simply
+     * set the source address to 0.0.0.0.
      */
     class IP : public PDU {
     public:
@@ -60,6 +67,15 @@ namespace Tins {
          * The type used to store addresses.
          */
         typedef IPv4Address address_type;
+
+        /**
+         * Type used to represent the different IP flags.
+         */
+        enum Flags {
+            FLAG_RESERVED = 4,
+            DONT_FRAGMENT = 2,
+            MORE_FRAGMENTS = 1
+        };
 
         /**
          * \brief Enum indicating the option's class.
@@ -285,10 +301,36 @@ namespace Tins {
 
         /**
          * \brief Getter for the fragment offset field.
+         * 
+         * This method is deprecated. Use IP::fragment_offset and IP::flags.
          *
+         * \deprecated
          * \return The fragment offset for this IP PDU.
+         * \sa IP::fragment_offset
+         * \sa IP::flags
          */
-        uint16_t frag_off() const { return Endian::be_to_host(_ip.frag_off); }
+        TINS_DEPRECATED(uint16_t frag_off() const) { return Endian::be_to_host(_ip.frag_off); }
+
+        /**
+         * \brief Getter for the fragment offset field.
+         * 
+         * This will return the fragment offset field, as present in the packet, 
+         * which indicates the offset of this fragment in blocks of 8 bytes. 
+         * 
+         * \return The fragment offset, measured in units of 8 byte blocks 
+         */
+        small_uint<13> fragment_offset() const { 
+            return Endian::be_to_host(_ip.frag_off) & 0x1fff;
+        }
+
+        /**
+         * \brief Getter for the flags field.
+         *
+         * \return The IP flags field
+         */
+        Flags flags() const {
+            return static_cast<Flags>(Endian::be_to_host(_ip.frag_off) >> 13); 
+        }
 
         /**
          * \brief Getter for the time to live field.
@@ -355,9 +397,32 @@ namespace Tins {
         /**
          * \brief Setter for the fragment offset field.
          *
+         * This method is deprecated. Use IP::fragment_offset and IP::flags.
+         *
+         * \deprecated
          * \param new_frag_off The new fragment offset.
+         * \sa IP::fragment_offset
+         * \sa IP::flags
          */
-        void frag_off(uint16_t new_frag_off);
+        TINS_DEPRECATED(void frag_off(uint16_t new_frag_off));
+        
+        /**
+         * \brief Setter for the fragment offset field.
+         *
+         * The value provided is measured in units of 8 byte blocks. This means that
+         * if you want this packet to have a fragment offset of <i>X</i>, 
+         * you need to provide <i>X / 8</i> as the argument to this method.
+         *  
+         * \param new_frag_off The new fragment offset, measured in units of 8 byte blocks.
+         */
+        void fragment_offset(small_uint<13> new_frag_off);
+
+        /**
+         * \brief Setter for the flags field.
+         * 
+         * \param new_flags The new IP flags field value.
+         */
+        void flags(Flags new_flags);
 
         /**
          * \brief Setter for the time to live field.
