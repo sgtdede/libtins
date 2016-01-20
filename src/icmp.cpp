@@ -266,9 +266,9 @@ bool ICMP::matches_response_generic(const PDU& rpdu) const
 		if (ricmp.size() < this->header_size())
 			return false;
 
-		if ((this->type() == ICMP4_ECHO_REQUEST && ricmp.type() == ICMP4_ECHO_REPLY) ||
-			(this->type() == ICMP4_TIMESTAMP_REQUEST && ricmp.type() == ICMP4_TIMESTAMP_REPLY) ||
-			(this->type() == ICMP4_MASK_REQUEST && ricmp.type() == ICMP4_MASK_REPLY))
+		if ((this->type() == ECHO_REQUEST && ricmp.type() == ECHO_REPLY) ||
+			(this->type() == TIMESTAMP_REQUEST && ricmp.type() == TIMESTAMP_REPLY) ||
+			(this->type() == ADDRESS_MASK_REQUEST && ricmp.type() == ADDRESS_MASK_REPLY))
 		{
 			return (this->sequence() == ricmp.sequence() && this->id() == ricmp.id());
 		}

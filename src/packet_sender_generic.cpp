@@ -61,7 +61,7 @@ namespace Tins {
 	{
 		//wait for previous packet to receive response (TODO: not ideal, plan future change)
 		while (sent_pdu) {
-			Sleep(1000);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		sent_pdu = &spdu;
 		PacketSender sender{ iface };
@@ -115,7 +115,7 @@ namespace Tins {
 	{	
 		//wait for previous packet to receive response (TODO: not ideal, plan future change)
 		while (sent_pdu) {
-			Sleep(1000);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		}
 		sent_pdu = spdu.clone();
 
