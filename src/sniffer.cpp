@@ -267,6 +267,8 @@ Sniffer::Sniffer(const std::string &device, unsigned max_packet_size, bool promi
     if (!phandle) {
         throw runtime_error(error);
     }
+
+
     set_pcap_handle(phandle);
 
     // Set the netmask if we are able to find it.
@@ -277,8 +279,8 @@ Sniffer::Sniffer(const std::string &device, unsigned max_packet_size, bool promi
 
     // Configure the sniffer's attributes prior to activation.
     configuration.configure_sniffer_pre_activation(*this);
-
-    // Finally, activate the pcap. In case of error throw runtime_error
+	
+	// Finally, activate the pcap. In case of error throw runtime_error
     if (pcap_activate(get_pcap_handle()) < 0) {
         throw std::runtime_error(pcap_geterr(get_pcap_handle()));
     }
@@ -352,6 +354,8 @@ void Sniffer::set_immediate_mode(bool enabled)
     }
     #endif // HAVE_PCAP_IMMEDIATE_MODE
 }
+
+
 
 void Sniffer::set_rfmon(bool rfmon_enabled)
 {

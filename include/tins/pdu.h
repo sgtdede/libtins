@@ -411,6 +411,10 @@ namespace Tins {
 		virtual bool matches_response_generic(const PDU& rpdu) const {
 			return false;
 		}
+		//TODO
+		virtual bool operator==(const PDU& rpdu) const {
+			return false;
+		}
 
         /**
          * \brief Check wether this PDU matches the specified flag.

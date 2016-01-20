@@ -152,6 +152,25 @@ bool EthernetII::matches_response(const uint8_t *ptr, uint32_t total_sz) const {
 }
 
 //AJOUT
+bool EthernetII::operator==(const PDU& rpdu) const {
+	try {
+		const EthernetII& reth = rpdu.rfind_pdu<EthernetII>();
+		//compare size
+		if (header_size() == reth.header_size() &&
+			src_addr() == reth.src_addr() &&
+			dst_addr() == reth.dst_addr())
+		{
+			return (inner_pdu() ? *inner_pdu() == rpdu : true);
+		}
+
+		return false;
+	}
+	catch (const pdu_not_found&) {
+		return false;
+	}
+}
+
+//AJOUT
 bool EthernetII::matches_response_generic(const PDU& rpdu) const
 {
 	try {

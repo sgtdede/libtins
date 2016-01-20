@@ -168,6 +168,8 @@ namespace Tins {
 		* \param rpdu, the reference of the packet.
 		*/
 		bool matches_response_generic(const PDU& rpdu) const;
+		//TODO
+		bool operator==(const PDU& rpdu) const;
 
         #ifndef _WIN32
         /** 

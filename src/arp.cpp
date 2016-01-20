@@ -123,6 +123,27 @@ bool ARP::matches_response(const uint8_t *ptr, uint32_t total_sz) const {
 }
 
 //AJOUT
+bool ARP::operator==(const PDU& rpdu) const
+{
+	try {
+		const ARP& rarp = rpdu.rfind_pdu<ARP>();
+
+		//compare size
+		if (this->header_size() == rarp.header_size() &&
+			this->sender_ip_addr() == rarp.sender_ip_addr() &&
+			this->target_ip_addr() == rarp.target_ip_addr())
+		{
+			return true;
+		}
+
+		return false;
+	}
+	catch (const pdu_not_found&) {
+		return false;
+	}
+}
+
+//AJOUT
 bool ARP::matches_response_generic(const PDU& rpdu) const 
 {
 	try {

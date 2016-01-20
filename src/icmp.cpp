@@ -235,6 +235,28 @@ bool ICMP::matches_response(const uint8_t *ptr, uint32_t total_sz) const {
 }
 
 //AJOUT
+bool ICMP::operator==(const PDU& rpdu) const
+{
+	try {
+		const ICMP& ricmp = rpdu.rfind_pdu<ICMP>();
+
+		//compare size
+		if (this->header_size() == ricmp.header_size() &&
+			this->type() == ricmp.type() &&
+			this->checksum() == ricmp.checksum() &&
+			this->code() == ricmp.code())
+		{
+			return true;
+		}
+
+		return false;
+	}
+	catch (const pdu_not_found&) {
+		return false;
+	}
+}
+
+//AJOUT
 bool ICMP::matches_response_generic(const PDU& rpdu) const
 {
 	try {
@@ -248,7 +270,6 @@ bool ICMP::matches_response_generic(const PDU& rpdu) const
 			(this->type() == ICMP4_TIMESTAMP_REQUEST && ricmp.type() == ICMP4_TIMESTAMP_REPLY) ||
 			(this->type() == ICMP4_MASK_REQUEST && ricmp.type() == ICMP4_MASK_REPLY))
 		{
-
 			return (this->sequence() == ricmp.sequence() && this->id() == ricmp.id());
 		}
 

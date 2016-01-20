@@ -494,7 +494,8 @@ private:
     template<typename ForwardIterator>
     void set_payload_contents(ForwardIterator start, ForwardIterator end) {
         size_t total_size = std::distance(start, end);
-        if (total_size > std::numeric_limits<uint16_t>::max()) {
+		// this fix weird compilation error, collision with windows.h ==> see http://stackoverflow.com/questions/2789481/problem-calling-stdmax
+        if (total_size > (std::numeric_limits<uint16_t>::max)()) {
             throw option_payload_too_large();
         }
         real_size_ = static_cast<uint16_t>(total_size);

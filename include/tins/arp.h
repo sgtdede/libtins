@@ -292,6 +292,8 @@ namespace Tins {
 		* \param rpdu, the reference of the packet.
 		*/
 		bool matches_response_generic(const PDU& rpdu) const;
+		//AJOUT
+		bool operator==(const PDU& rpdu) const;
 
         /**
          * \sa PDU::clone

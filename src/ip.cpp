@@ -465,6 +465,28 @@ bool IP::matches_response(const uint8_t *ptr, uint32_t total_sz) const {
 }
 
 //AJOUT
+bool IP::operator==(const PDU& rpdu) const
+{
+	try {
+		const IP& rip = rpdu.rfind_pdu<IP>();
+
+		if (this->header_size() == rip.header_size() &&
+			this->src_addr() == rip.src_addr() &&
+			this->dst_addr() == rip.dst_addr() &&
+			this->protocol() == rip.protocol())
+		{
+			return (inner_pdu() ? *inner_pdu() == rpdu : true);
+		}
+		
+		return false;
+	}
+	catch (const pdu_not_found&) {
+		return false;
+	}
+
+}
+
+//AJOUT
 bool IP::matches_response_generic(const PDU& rpdu) const
 {
 	try {
@@ -484,11 +506,12 @@ bool IP::matches_response_generic(const PDU& rpdu) const
 				const IP& ip_orig = icmp_payload.to<IP>();
 				if (this->rfind_pdu<IP>().id() == ip_orig.id())
 				{
-					std::cout << " ICMP MATCH: identifier " << ip_orig.id() << std::endl;
 					return true;
 				}
 			}
 			catch (const pdu_not_found&){
+			}
+			catch (const malformed_packet&) {
 			}
 		}
 

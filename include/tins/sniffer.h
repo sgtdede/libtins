@@ -350,6 +350,7 @@ namespace Tins {
         void set_rfmon(bool rfmon_enabled);
 
         void set_immediate_mode(bool enabled);
+
     };
 
     /**
